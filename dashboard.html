@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prekryv akcií vo VOO, VTI a VT</title>
+<title>Prekryv akcií v ETF</title>
 <style>
   :root { font-family: system-ui, sans-serif; color: #132b2a; background: #f1f5f1; }
   body { max-width: 70rem; margin: 0 auto; padding: 2rem 1rem; }
@@ -37,7 +37,7 @@
 </head>
 <body>
 <header>
-  <h1>Prekryv akcií vo VOO, VTI a VT</h1>
+  <h1 id="title">Prekryv akcií v ETF</h1>
   <p class="notice" id="dataset"></p>
 </header>
 <form id="portfolio">
@@ -82,6 +82,10 @@ const countFormat = new Intl.NumberFormat("sk", {maximumFractionDigits: 2});
 const pct = value => pctFormat.format(value);
 const vt = new Map(Object.entries(report.exposures.VT));
 const funds = report.funds;
+byId("title").textContent = "Prekryv akcií · " + funds.join(", ");
+if (!report.sub_industry_exposures) {
+  byId("dimension").querySelector('option[value="sub_industry"]').remove();
+}
 
 function node(tag, content, attributes = {}) {
   const element = document.createElement(tag);
@@ -220,8 +224,10 @@ for (const [pair, share] of Object.entries(report.overlap)) {
 for (const fund of funds) {
   const coverage = report.coverage[fund];
   const basis = coverage.basis === "nav" ? " NAV" : " vykázanej trhovej hodnoty";
-  const details = fund + " — akcie " + pct(coverage.equity_share) + basis + ", mimo akcií " +
-    pct(coverage.outside_equity_share) + basis + ", zahrnuté akciové riadky " +
+  const shares = coverage.basis === "equity_only" ? "" :
+    "akcie " + pct(coverage.equity_share) + basis + ", mimo akcií " +
+      pct(coverage.outside_equity_share) + basis + ", ";
+  const details = fund + " — " + shares + "zahrnuté akciové riadky " +
     coverage.included_equity_rows + "/" + coverage.equity_rows + ", bez hodnoty " +
     coverage.missing_equity_value_rows + " · ";
   const item = node("li", details);
@@ -238,3 +244,4 @@ setWeights(funds.map(() => 100 / funds.length));
 </script>
 </body>
 </html>
+
