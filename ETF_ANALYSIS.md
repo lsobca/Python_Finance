@@ -35,6 +35,16 @@ Kontrola októbrového vstupu podľa verejnej tabuľky Vanguardu. Počty označu
 
 Pri tretinových váhach dávajú tieto tri firmy spolu 17,21 % pred renormalizáciou akciovej zložky. Pri importe úplného súboru môže byť počet riadkov vyšší pre hotovosť a ďalšie nástroje. Počet akciových riadkov a uvedené váhy pomáhajú odhaliť neúplný import alebo iný dátum exportu.
 
+Všetky tri CSV exporty k 31. 10. 2026 boli stiahnuté do priečinka `~/Downloads` na lokálnom počítači.
+
+| Fond | Názov súboru |
+|---|---|
+| VOO | `Holdings_details_S&P_500_ETF.csv` |
+| VTI | `Holdings_details_Morningstar_Total_Stock_Market_ETF.csv` |
+| VT | `Holdings_details_Total_World_Stock_ETF.csv` |
+
+CSV obsahuje samostatné sekcie `Equity`, `Fixed income` a `Short-term reserves`. Pre výpočet použi v sekcii `Equity` hodnoty z `MARKET VALUE*` a normalizuj ich súčtom. Stĺpec `% OF FUNDS*` zobrazuje zaokrúhlené percentá a na výpočet tisícov malých pozícií je vhodnejšia presnejšia trhová hodnota. K dispozícii sú aj `HOLDINGS`, `SEDOL`, `TICKER`, `COUNTRY` a `SUB-INDUSTRY`. Export VOO uvádza GICS a exporty VTI a VT ICB. Sektorové výsledky vyžadujú výslovné mapovanie na spoločné kategórie. Bez mapovania môže byť výstup označený ako natívne subodvetvie a nejednoznačné riadky ostanú nezaradené.
+
 ## Prvá úloha pre Codex
 
 1. Over dostupnosť úplných držieb všetkých troch fondov k spoločnému dátumu. Do README zapíš postup získania vstupov, ich formát a spôsob spustenia.
