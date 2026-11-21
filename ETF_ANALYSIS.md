@@ -17,6 +17,14 @@ Podľa údajov Vanguardu k 30. 9. 2026 mal VT v USA približne 62,4 % akciovej z
 - [Vanguard VTI](https://workplace.vanguard.com/assets/corp/fund_communications/pdf_publish/us-products/fact-sheet/F0970.pdf)
 - [Vanguard VT](https://workplace.vanguard.com/assets/corp/fund_communications/pdf_publish/us-products/fact-sheet/F3141.pdf)
 
+## Zdroj úplných držieb
+
+Na oficiálnych stránkach všetkých troch fondov sa v časti **Holdings details** zobrazil dátum **31. 10. 2026** a ovládací prvok **Export full holdings** označený ako export CSV. Tento dátum je spoločný kandidát na hlavný výpočet. Dátum a úplnosť treba ešte overiť zo samotných súborov pred spracovaním. Septembrové kontrolné čísla používaj len ako orientačnú kontrolu poradia a veľkosti podielov.
+
+- [Profil VOO](https://advisors.vanguard.com/investments/products/voo/vanguard-sp-500-etf)
+- [Profil VTI](https://advisors.vanguard.com/investments/products/vti/vanguard-morningstar-total-stock-market-etf)
+- [Profil VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf)
+
 ## Prvá úloha pre Codex
 
 1. Over dostupnosť úplných držieb všetkých troch fondov k spoločnému dátumu. Do README zapíš postup získania vstupov, ich formát a spôsob spustenia.
