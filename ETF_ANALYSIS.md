@@ -78,3 +78,7 @@ V októbrových exportoch sa hodnoty `SUB-INDUSTRY` zhodovali pri všetkých spo
 | Semiconductors | 11,24 % | 13,10 % |
 | Technology Hardware, Storage & Peripherals | 6,12 % | 7,67 % |
 | Systems Software | 4,44 % | 6,27 % |
+
+Pre širšie sektory sa v projekte používa [spoločný prevodník](data/vanguard_subindustry_sectors.csv). Pokrýva všetkých 163 pomenovaných subodvetví z októbrových exportov. Každý názov sa porovnal s nomenklatúrou GICS a priradil k jednému z 11 sektorov. Zdrojové „---“ ostáva nezaradené. Po harmonizácii má sektor informačných technológií **29,24 %** vo VT a **33,91 %** v kombinácii po tretinách. Nezaradených je približne 0,01 % akciovej zložky vo VT a 0,005 % v kombinácii.
+
+[Metodika GICS a hierarchia klasifikácie](https://www.msci.com/indexes/documents/methodology/1_MSCI_Global_Industry_Classification_Standard_GICS_Methodology_20250220.pdf)
