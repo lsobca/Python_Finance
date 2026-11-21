@@ -51,6 +51,10 @@ def load_sources(data_dir):
     kinds = {row["kind"] for row in sources.values()}
     if kinds not in ({"full"}, {"synthetic"}):
         raise ValueError("sources.csv: použi iba úplné reálne dáta alebo syntetickú vzorku")
+    for row in sources.values():
+        row["weight_basis"] = row.get("weight_basis") or "nav"
+        if row["weight_basis"] not in {"nav", "market_value_usd"}:
+            raise ValueError("sources.csv: neznámy základ váh")
     return sources
 
 
@@ -79,49 +83,81 @@ def load_mapping(data_dir):
     return issuers, position_map
 
 
-def load_holdings(data_dir, fund, position_map):
+def load_holdings(data_dir, fund, position_map, basis):
     positions = set()
     equity = defaultdict(list)
     excluded = defaultdict(list)
-    columns = ("position_id", "asset_type", "weight_pct_nav")
-    equity_rows = 0
+    sub_industries = defaultdict(list)
+    value_column = "market_value_usd" if basis == "market_value_usd" else "weight_pct_nav"
+    columns = ("position_id", "asset_type", value_column)
+    equity_rows = included_rows = missing_value_rows = missing_equity_value_rows = 0
     for row in read_csv(data_dir / f"{fund}.csv", columns):
         position_id, asset_type = row["position_id"], row["asset_type"]
         if not position_id or not asset_type or position_id in positions:
             raise ValueError(f"{fund}: chýbajúci typ aktíva alebo chybný identifikátor {position_id!r}")
         positions.add(position_id)
-        weight = float(row["weight_pct_nav"]) / 100
-        if not isfinite(weight):
-            raise ValueError(f"{fund}: neplatná váha pozície {position_id}")
-        if asset_type != "equity":
-            excluded[asset_type].append(weight)
+        is_equity = asset_type == "equity"
+        equity_rows += is_equity
+        if basis == "market_value_usd" and not row[value_column]:
+            missing_value_rows += 1
+            missing_equity_value_rows += is_equity
             continue
-        if weight < 0:
+        value = float(row[value_column])
+        if not isfinite(value):
+            raise ValueError(f"{fund}: neplatná váha pozície {position_id}")
+        if not is_equity:
+            excluded[asset_type].append(value)
+            continue
+        if value < 0:
             raise ValueError(f"{fund}: záporná váha akcie {position_id}")
-        equity_rows += 1
-        if weight:
+        if value:
             if position_id not in position_map:
                 raise ValueError(f"{fund}: chýba mapovanie akcie {position_id}")
-            equity[position_map[position_id]].append(weight)
+            included_rows += 1
+            equity[position_map[position_id]].append(value)
+            sub_industries[row.get("sub_industry") or UNCLASSIFIED].append(value)
 
-    raw_equity = {issuer: fsum(weights) for issuer, weights in equity.items()}
-    equity_nav = fsum(raw_equity.values())
-    if equity_nav <= 0:
+    raw_equity = {issuer: fsum(values) for issuer, values in equity.items()}
+    equity_value = fsum(raw_equity.values())
+    if equity_value <= 0:
         raise ValueError(f"{fund}: chýba kladná akciová zložka")
-    excluded_nav = {category: fsum(weights) for category, weights in sorted(excluded.items())}
-    rows_nav = fsum([equity_nav, *excluded_nav.values()])
+    excluded_values = {category: fsum(values) for category, values in sorted(excluded.items())}
+    excluded_value = fsum(excluded_values.values())
+    reported_value = fsum([equity_value, excluded_value])
+    denominator = reported_value if basis == "market_value_usd" else 100
+    if denominator <= 0:
+        raise ValueError(f"{fund}: nekladný súčet vykázaných trhových hodnôt")
     coverage = {
+        "basis": basis,
         "rows": len(positions),
         "equity_rows": equity_rows,
-        "excluded_rows": len(positions) - equity_rows,
-        "rows_nav": rows_nav,
-        "equity_nav": equity_nav,
-        "excluded_rows_nav": fsum(excluded_nav.values()),
-        "excluded_by_asset_type_nav": excluded_nav,
-        "unreconciled_nav": 1 - rows_nav,
-        "outside_equity_nav": 1 - equity_nav,
+        "included_equity_rows": included_rows,
+        "excluded_rows": len(positions) - included_rows,
+        "missing_value_rows": missing_value_rows,
+        "missing_equity_value_rows": missing_equity_value_rows,
+        "equity_share": equity_value / denominator,
+        "outside_equity_share": 1 - equity_value / denominator,
+        "excluded_rows_share": excluded_value / denominator,
+        "excluded_by_asset_type_share": {
+            category: value / denominator for category, value in excluded_values.items()
+        },
     }
-    return {issuer: weight / equity_nav for issuer, weight in raw_equity.items()}, coverage
+    if basis == "nav":
+        coverage.update({
+            "rows_nav": reported_value / denominator,
+            "equity_nav": coverage["equity_share"],
+            "excluded_rows_nav": coverage["excluded_rows_share"],
+            "excluded_by_asset_type_nav": coverage["excluded_by_asset_type_share"],
+            "unreconciled_nav": 1 - reported_value / denominator,
+            "outside_equity_nav": coverage["outside_equity_share"],
+        })
+    else:
+        coverage.update({"reported_market_value_usd": reported_value, "equity_market_value_usd": equity_value})
+    return (
+        {issuer: value / equity_value for issuer, value in raw_equity.items()},
+        coverage,
+        {group: fsum(values) / equity_value for group, values in sorted(sub_industries.items())},
+    )
 
 
 def group_exposures(weights, issuers, field):
@@ -160,11 +196,17 @@ def weighted_overlap(left, right):
 def analyze(data_dir):
     sources = load_sources(data_dir)
     issuers, position_map = load_mapping(data_dir)
-    exposures, coverage = {}, {}
+    exposures, coverage, sub_industry_exposures = {}, {}, {}
     for fund in FUNDS:
-        exposures[fund], coverage[fund] = load_holdings(data_dir, fund, position_map)
+        basis = sources[fund]["weight_basis"]
+        exposures[fund], coverage[fund], sub_industry_exposures[fund] = load_holdings(data_dir, fund, position_map, basis)
     equal_weights = dict.fromkeys(FUNDS, 1 / len(FUNDS))
     mix = mix_holdings(equal_weights, exposures)
+    scenarios = {fund: summarize(weights, issuers) for fund, weights in exposures.items()}
+    scenarios["equal"] = summarize(mix, issuers)
+    for fund, groups in sub_industry_exposures.items():
+        scenarios[fund]["sub_industry"] = groups
+    scenarios["equal"]["sub_industry"] = mix_holdings(equal_weights, sub_industry_exposures)
     return {
         "as_of": sources["VT"]["as_of"],
         "kind": sources["VT"]["kind"],
@@ -176,12 +218,10 @@ def analyze(data_dir):
             for left, right in combinations(FUNDS, 2)
         },
         "equal_weights": equal_weights,
-        "scenarios": {
-            **{fund: summarize(weights, issuers) for fund, weights in exposures.items()},
-            "equal": summarize(mix, issuers),
-        },
+        "scenarios": scenarios,
         "issuers": {key: issuers[key] for key in sorted(set().union(*exposures.values()))},
         "exposures": exposures,
+        "sub_industry_exposures": sub_industry_exposures,
     }
 
 

@@ -12,15 +12,16 @@
   p { line-height: 1.5; }
   section, form { border: 1px solid #c6d8cf; background: white; border-radius: .7rem; padding: 1rem; margin: 1rem 0; }
   input, select, button { font: inherit; color: inherit; padding: .35rem; }
-  input { width: 5rem; }
+  input[type="number"] { width: 5rem; }
+  input[type="range"] { width: 10rem; max-width: 100%; }
   #allocations { display: flex; flex-wrap: wrap; gap: 1rem; }
-  #allocations label { display: grid; gap: .25rem; }
+  #allocations > div { display: grid; justify-items: start; gap: .25rem; }
   button { margin: .5rem .5rem .25rem 0; cursor: pointer; }
   #status { color: #784020; }
   table { border-collapse: collapse; width: 100%; text-align: left; }
   td, th { padding: .5rem; border-bottom: 1px solid #d9e5df; }
   td:not(:first-child), th:not(:first-child) { text-align: right; }
-  .compare { display: grid; grid-template-columns: minmax(6rem, 1fr) repeat(2, minmax(4.5rem, 1fr)); gap: .35rem .75rem; align-items: center; }
+  .compare { display: grid; grid-template-columns: minmax(6rem, 1fr) repeat(3, minmax(3.5rem, 1fr)); gap: .35rem .75rem; align-items: center; }
   .compare > * { overflow-wrap: anywhere; }
   .column { display: grid; gap: .2rem; font-variant-numeric: tabular-nums; }
   meter { width: 100%; height: .8rem; }
@@ -29,6 +30,9 @@
   meter::-moz-meter-bar { background: #167263; }
   .baseline::-moz-meter-bar { background: #677d9b; }
   .notice { font-weight: bold; }
+  @media (max-width: 30rem) {
+    .compare { grid-template-columns: minmax(4.5rem, 1fr) repeat(3, minmax(2.7rem, 1fr)); gap: .35rem .45rem; }
+  }
 </style>
 </head>
 <body>
@@ -58,6 +62,7 @@
   <select id="dimension">
     <option value="country">Krajiny</option>
     <option value="sector">Sektora</option>
+    <option value="sub_industry">Subodvetvia Vanguard</option>
     <option value="issuer">Emitenta (Top 10 v každom scenári)</option>
   </select>
   <div id="chart" class="compare" role="table" aria-label="Expozície portfólia oproti VT"></div>
@@ -103,17 +108,30 @@ function distribute(weights, field) {
   return groups;
 }
 
-function drawChart(weights) {
+function mixGroupsByFund(allocations, exposures) {
+  const mix = new Map();
+  for (const [index, fund] of funds.entries()) {
+    if (allocations[index] === 0) continue;
+    for (const [key, weight] of Object.entries(exposures[fund])) {
+      const contribution = allocations[index] * weight;
+      if (contribution > 0) mix.set(key, (mix.get(key) || 0) + contribution);
+    }
+  }
+  return mix;
+}
+
+function drawChart(weights, allocations) {
   const field = byId("dimension").value;
-  const mixGroups = distribute(weights, field);
-  const vtGroups = distribute(vt, field);
+  const native = field === "sub_industry";
+  const mixGroups = native ? mixGroupsByFund(allocations, report.sub_industry_exposures) : distribute(weights, field);
+  const vtGroups = native ? new Map(Object.entries(report.sub_industry_exposures.VT)) : distribute(vt, field);
   const limited = groups => field === "issuer" ? ranked(groups).slice(0, 10).map(([id]) => id) : groups.keys();
   const keys = new Set([...limited(mixGroups), ...limited(vtGroups)]);
   const values = Array.from(keys, key => [key, mixGroups.get(key) || 0, vtGroups.get(key) || 0]);
   values.sort((a, b) => Math.max(b[1], b[2]) - Math.max(a[1], a[2]) || a[0].localeCompare(b[0], "sk"));
   const chart = byId("chart");
   const header = node("div", "", {role: "row", style: "display: contents"});
-  for (const label of ["Skupina", "Portfólio", "VT"]) header.append(node("strong", label, {role: "columnheader"}));
+  for (const label of ["Skupina", "Portfólio", "VT", "Rozdiel"]) header.append(node("strong", label, {role: "columnheader"}));
   chart.replaceChildren(header);
   for (const [key, mix, baseline] of values) {
     const label = field === "issuer" ? report.issuers[key].issuer : key;
@@ -125,6 +143,9 @@ function drawChart(weights) {
       cell.append(node("meter", "", {class: css, min: 0, max: 1, value, "aria-hidden": "true"}));
       row.append(cell);
     }
+    const difference = 100 * (mix - baseline);
+    const delta = Math.abs(difference) < .005 ? 0 : difference;
+    row.append(node("span", countFormat.format(delta) + " p. b.", {role: "cell", class: "column"}));
     chart.append(row);
   }
 }
@@ -140,17 +161,25 @@ function indicators(weights) {
 }
 
 const controls = funds.map(fund => {
+  const group = node("div", "");
   const label = node("label", fund, {for: "weight-" + fund});
   const input = node("input", "", {id: "weight-" + fund, type: "number", min: 0, max: 100, step: "any"});
-  label.append(input);
-  byId("allocations").append(label);
-  return input;
+  const slider = node("input", "", {
+    type: "range", min: 0, max: 100, step: .1, "aria-label": "Posuvník váhy " + fund,
+  });
+  slider.addEventListener("input", () => { input.value = slider.value; });
+  input.addEventListener("input", () => {
+    if (input.validity.valid && Number.isFinite(input.valueAsNumber)) slider.value = input.value;
+  });
+  group.append(label, slider, input);
+  byId("allocations").append(group);
+  return {input, slider};
 });
 
 function update() {
-  const raw = controls.map(input => input.valueAsNumber);
+  const raw = controls.map(({input}) => input.valueAsNumber);
   const total = sum(raw);
-  if (!controls.every(input => input.validity.valid) || !raw.every(Number.isFinite) || total <= 0) {
+  if (!controls.every(({input}) => input.validity.valid) || !raw.every(Number.isFinite) || total <= 0) {
     byId("status").textContent = "Zadajte váhy od 0 do 100, aspoň jednu kladnú.";
     byId("metrics").replaceChildren();
     byId("chart").replaceChildren();
@@ -160,13 +189,7 @@ function update() {
   byId("status").textContent = "";
   const allocations = raw.map(weight => weight / total);
   byId("normalized").textContent = funds.map((fund, index) => fund + " " + pct(allocations[index])).join(" · ");
-  const mix = new Map();
-  for (const [index, fund] of funds.entries()) {
-    if (allocations[index] === 0) continue;
-    for (const [issuer, weight] of Object.entries(report.exposures[fund])) {
-      mix.set(issuer, (mix.get(issuer) || 0) + allocations[index] * weight);
-    }
-  }
+  const mix = mixGroupsByFund(allocations, report.exposures);
   const baseline = indicators(vt);
   const rows = indicators(mix).map(([label, value], index) => {
     const row = node("tr", "");
@@ -174,11 +197,14 @@ function update() {
     return row;
   });
   byId("metrics").replaceChildren(...rows);
-  drawChart(mix);
+  drawChart(mix, allocations);
 }
 
 function setWeights(weights) {
-  controls.forEach((input, index) => { input.value = weights[index]; });
+  controls.forEach(({input, slider}, index) => {
+    input.value = weights[index];
+    slider.value = weights[index];
+  });
   update();
 }
 
@@ -193,8 +219,11 @@ for (const [pair, share] of Object.entries(report.overlap)) {
 }
 for (const fund of funds) {
   const coverage = report.coverage[fund];
-  const details = fund + " — akcie " + pct(coverage.equity_nav) + " NAV, mimo akcií " +
-    pct(coverage.outside_equity_nav) + " NAV, pokrytie riadkov " + pct(coverage.rows_nav) + " NAV · ";
+  const basis = coverage.basis === "nav" ? " NAV" : " vykázanej trhovej hodnoty";
+  const details = fund + " — akcie " + pct(coverage.equity_share) + basis + ", mimo akcií " +
+    pct(coverage.outside_equity_share) + basis + ", zahrnuté akciové riadky " +
+    coverage.included_equity_rows + "/" + coverage.equity_rows + ", bez hodnoty " +
+    coverage.missing_equity_value_rows + " · ";
   const item = node("li", details);
   const source = report.sources[fund].source;
   if (/^https?:\/\//i.test(source)) {
@@ -204,6 +233,7 @@ for (const fund of funds) {
   }
   byId("sources").append(item);
 }
+if (report.kind === "synthetic") byId("dimension").querySelector('[value="sub_industry"]').remove();
 setWeights(funds.map(() => 100 / funds.length));
 </script>
 </body>
