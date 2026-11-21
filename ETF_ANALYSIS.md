@@ -96,3 +96,19 @@ Rovnaký výpočet sme zopakovali na úplných akciových držbách všetkých t
 Na všetkých troch dátumoch kombinácia zvýšila váhu amerických akcií aj informačných technológií. Efektívny počet pozícií bol v kombinácii približne polovičný oproti VT. Záver platí pre tri skontrolované konce mesiacov.
 
 V augustových a septembrových exportoch niesla akciová sekcia vybraný historický dátum, kým sekcie dlhopisov a krátkodobých rezerv ostali datované k 31. 10. 2026. Import ich pri historických dátumoch vynechal. Percentá pokrytia v historickom výstupe sa preto vzťahujú na zahrnuté riadky, nie na celý fond vrátane rezerv. Použité počty akciových riadkov VOO / VTI / VT boli 505 / 3 507 / 10 088 za august a 505 / 3 519 / 10 185 za september. V každom z týchto dvoch exportov VT boli navyše dva akciové riadky bez trhovej hodnoty, ktoré nevstúpili do výpočtu.
+
+## Porovnanie svetových ETF k 31. 10. 2026
+
+Otázka rozšírenia je, či kombinácia širokých svetových ETF zlepší rozloženie akciových váh oproti samotnému VT. Na tento dátum máme úplné držby VT a Vanguard FTSE All-World UCITS ETF (ISIN IE00BK5BQT80, tickery VWCE/VWRP). Export iShares MSCI ACWI ETF obsahuje úplné držby k 19. 11. 2026. Októbrové riadky na liste Historical sú časovým radom fondu, preto ACWI zatiaľ do októbrového porovnania nevstupuje.
+
+| Scenár | Emitenti podľa použitého párovania | Efektívny počet pozícií | Podiel USA |
+|---|---:|---:|---:|
+| Samotné VT | 10 089 | 127,76 | 63,18 % |
+| Samotné VWCE | 3 497 | 105,65 | 62,94 % |
+| 50 % VT + 50 % VWCE | 10 205 | 115,97 | 63,06 % |
+
+Vážený prekryv VT a VWCE podľa použitého párovania je 89,64 %. Počítame z kladných trhových hodnôt akciových držieb, ktoré normalizujeme v každom fonde zvlášť. Emitent sa identifikuje podľa názvu zjednoteného pomocou Unicode NFKC, veľkosti písmen a medzier a podľa kódu krajiny uvádzaného v exporte. Rôzne názvy alebo krajiny toho istého emitenta môžu ovplyvniť počty, prekryv aj efektívny počet pozícií. Výsledok z tejto dvojice platí pre októbrový výrez a dané váhy.
+
+- [Držby VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf)
+- [Držby VWCE/VWRP](https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating?tab=portfolio-data)
+- [Držby ACWI](https://www.blackrock.com/us/individual/products/239600/ishares-msci-acwi-etf-acwi#holdings)
