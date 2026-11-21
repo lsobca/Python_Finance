@@ -92,9 +92,14 @@ def parse_export(path, fund, title):
                     ))
             elif fields is not None and len(row) == 1:
                 section, fields = None, None
-    if not found_fund or set(sections) != set(SECTIONS) or len(set(sections.values())) != 1:
-        raise ValueError(f"{path}: nezhodný fond, chýbajúce sekcie alebo rôzne dátumy")
-    as_of = sections["Equity"].isoformat()
+    if not found_fund or set(sections) != set(SECTIONS):
+        raise ValueError(f"{path}: nezhodný fond alebo chýbajúce sekcie")
+    equity_date = sections["Equity"]
+    mismatched = {SECTIONS[name] for name, date in sections.items() if date != equity_date}
+    if mismatched:
+        print(f"{fund}: vynechané neakciové sekcie s iným dátumom: {sorted(mismatched)}")
+        positions = [position for position in positions if position.asset_type not in mismatched]
+    as_of = equity_date.isoformat()
     equity_rows = sum(position.asset_type == "equity" for position in positions)
     if not equity_rows or (as_of == "2026-10-31" and equity_rows != OCTOBER_EQUITY_ROWS[fund]):
         raise ValueError(f"{path}: neočakávaný počet akciových riadkov ({equity_rows})")
