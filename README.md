@@ -21,7 +21,7 @@ Otvor `output/october/index.html`. Posuvníky aj číselné polia prepočítajú
 
 ## Vstupy a mapovanie
 
-- `sources.csv` zaznamenáva fond, dátum, odkaz na profil, typ dát, základ výpočtu, názov exportu a kontrolný odtlačok SHA-256. Import overuje spoločný dátum sekcií aj fondov a pri októbri aj počet akciových riadkov voči verejným tabuľkám Vanguardu.
+- `sources.csv` zaznamenáva fond, dátum, odkaz na profil, typ dát, základ výpočtu, názov exportu a kontrolný odtlačok SHA-256. Import overuje spoločný dátum akciových sekcií všetkých fondov, vynechá neakciové sekcie s odlišným dátumom a pri októbri aj počet akciových riadkov voči verejným tabuľkám Vanguardu.
 - `VOO.csv`, `VTI.csv` a `VT.csv` obsahujú identifikátor pozície, typ aktíva a presnú vykázanú hodnotu v USD. Identifikátor tvorí SEDOL alebo fond a číslo riadka originálu, keď SEDOL chýba. Súbory zachovávajú aj pôvodný názov, ticker, krajinu a subodvetvie. Prázdna trhová hodnota zostáva prázdna.
 - `issuer_map.csv` spája identifikátory pozícií s emitentom cez kód krajiny Vanguardu a názov zjednotený pomocou Unicode NFKC, veľkosti písmen a medzier. Triedy s rovnakým názvom, napríklad Alphabet, sa tým spoja. Zhodný SEDOL s nezhodným emitentom preruší import. Ostatné varianty názvov alebo rozdielne krajiny si vyžadujú kontrolu mapy pred analýzou. Krajina vychádza z poľa Vanguardu a chýbajúci kód sa započíta do kategórie **Nezaradené**.
 - [Prevodník subodvetví](data/vanguard_subindustry_sectors.csv) mapuje 163 októbrových názvov na 11 spoločných sektorov. V spoločných SEDOL boli názvy subodvetví zhodné, pričom Vanguard uvádza GICS pri VOO a ICB pri VTI a VT. Emitent dostane sektor, ak jeho dostupné mapovania dávajú jeden výsledok. Pri chýbajúcom alebo rozpornom mapovaní sa jeho váha vykáže ako **Nezaradené**. Graf subodvetví používa pôvodné názvy na úrovni pozícií.
@@ -46,6 +46,8 @@ Párový prekryv dosiahol 89,31 % pre VOO a VTI, 56,89 % pre VOO a VT a 62,45 % 
 | VT | 10 158 / 10 160 | 0,93 % | 2 |
 
 Dva riadky bez hodnoty vo VT sú PhosAgro GDR a Norilsk Nickel ADR. Pri sektoroch ostalo nezaradených 0,000 % vo VOO, 0,003 % vo VTI a 0,011 % vo VT. [Analytické zadanie a nezávislá kontrola](ETF_ANALYSIS.md)
+
+Porovnanie augustových, septembrových a októbrových držieb je v časti [Kontrola výsledku na troch spoločných dátumoch](ETF_ANALYSIS.md#kontrola-výsledku-na-troch-spoločných-dátumoch).
 
 ## Syntetická vzorka
 
