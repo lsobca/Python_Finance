@@ -68,3 +68,13 @@ Kontrolný výpočet z úplných CSV exportov normalizoval kladné trhové hodno
 Vážený prekryv podľa emitentov dosiahol 89,31 % (VOO/VTI), 56,89 % (VOO/VT) a 62,45 % (VTI/VT). Vyšší počet unikátnych emitentov v kombinácii sprevádza nižší efektívny počet pozícií, keďže kombinácia zvyšuje váhy už dominantných spoločností. Koncentrácia podľa tejto metriky nevyjadruje volatilitu ani koreláciu portfólia.
 
 V kontrolnom výpočte bolo zahrnutých 506 akciových riadkov VOO, 3 511 VTI a 10 158 VT. Dve ďalšie pozície VT (PhosAgro GDR a Norilsk Nickel ADR) nemajú v exporte uvedenú trhovú hodnotu, preto sa nezahrnuli do výpočtu váh. Priemerných 17,32 % pre tri firmy vychádza z normalizácie akciovej zložky. Hodnota 17,21 % vyššie vychádza z verejných váh celého fondu zaokrúhlených na dve desatinné miesta.
+
+### Kontrola odvetvovej klasifikácie
+
+V októbrových exportoch sa hodnoty `SUB-INDUSTRY` zhodovali pri všetkých spoločných SEDOL v každej dvojici fondov (503 pri VOO/VTI, 502 pri VOO/VT a 1 482 pri VTI/VT). Pri tomto dátume preto môžeme zobraziť presné názvy subodvetví ako samostatný výstup. Pre širšie sektory treba k zdrojovým názvom použiť spoločný prevodník. Príklad kontrolného porovnania v jednotnej akciovej báze:
+
+| Subodvetvie | VT | Tri fondy po tretinách |
+|---|---:|---:|
+| Semiconductors | 11,24 % | 13,10 % |
+| Technology Hardware, Storage & Peripherals | 6,12 % | 7,67 % |
+| Systems Software | 4,44 % | 6,27 % |
