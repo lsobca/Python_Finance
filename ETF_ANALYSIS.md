@@ -25,6 +25,16 @@ Na oficiálnych stránkach všetkých troch fondov sa v časti **Holdings detail
 - [Profil VTI](https://advisors.vanguard.com/investments/products/vti/vanguard-morningstar-total-stock-market-etf)
 - [Profil VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf)
 
+Kontrola októbrového vstupu podľa verejnej tabuľky Vanguardu. Počty označujú akciové riadky pred spojením tried akcií na úrovni emitenta. Uvedené percentá sú publikované váhy fondu.
+
+| Fond | Akciové riadky | Apple | NVIDIA | Microsoft |
+|---|---:|---:|---:|---:|
+| VOO | 506 | 7,69 % | 7,58 % | 5,93 % |
+| VTI | 3 511 | 6,90 % | 6,43 % | 5,32 % |
+| VT | 10 160 | 4,31 % | 4,13 % | 3,35 % |
+
+Pri tretinových váhach dávajú tieto tri firmy spolu 17,21 % pred renormalizáciou akciovej zložky. Pri importe úplného súboru môže byť počet riadkov vyšší pre hotovosť a ďalšie nástroje. Počet akciových riadkov a uvedené váhy pomáhajú odhaliť neúplný import alebo iný dátum exportu.
+
 ## Prvá úloha pre Codex
 
 1. Over dostupnosť úplných držieb všetkých troch fondov k spoločnému dátumu. Do README zapíš postup získania vstupov, ich formát a spôsob spustenia.
