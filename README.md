@@ -1,8 +1,18 @@
 # Tri ETF, tie isté akcie?
 
-Python projekt porovnáva VOO, VTI, VT a ich kombináciu na úrovni emitentov. Vyžaduje Python 3.9 alebo novší. Interaktívny graf funguje v prehliadači aj bez pripojenia.
+Python projekt porovnáva tri svetové ETF (VT, VWCE a ACWI) na úrovni emitentov. Samostatný experiment porovnáva pridanie VOO a VTI k VT. Vyžaduje Python 3.9 alebo novší. Interaktívny graf funguje v prehliadači aj bez pripojenia.
 
-## Spustenie s exportmi Vanguardu
+## Hlavné porovnanie troch svetových ETF
+
+Pre októbrové porovnanie použi pôvodné exporty VT a VWCE (VWRP) k 31. 10. 2026 a ACWI k 30. 10. 2026. Cesty nižšie nahraď názvami svojich súborov.
+
+```bash
+python3 global_etf.py --vt VT.csv --vwce VWCE.xlsx --acwi ACWI.csv
+```
+
+Otvor `output/global-october/index.html` pre graf s posuvníkmi. Vedľa neho je `analysis.json`. Výsledky a predpoklady sú v [metodike](ETF_ANALYSIS.md#hlavné-porovnanie-svetových-etf-na-konci-októbra-2026).
+
+## Spustenie pôvodného experimentu s exportmi Vanguardu
 
 Na profiloch [VOO](https://advisors.vanguard.com/investments/products/voo/vanguard-sp-500-etf), [VTI](https://advisors.vanguard.com/investments/products/vti/vanguard-morningstar-total-stock-market-etf) a [VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf) otvor **Holdings details**, vyber rovnaký dátum a použi **Export full holdings**. Pri kontrolnom výpočte bol dátum 31. 10. 2026. V jednom priečinku maj tieto tri súbory.
 
