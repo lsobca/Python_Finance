@@ -97,18 +97,23 @@ Na všetkých troch dátumoch kombinácia zvýšila váhu amerických akcií aj 
 
 V augustových a septembrových exportoch niesla akciová sekcia vybraný historický dátum, kým sekcie dlhopisov a krátkodobých rezerv ostali datované k 31. 10. 2026. Import ich pri historických dátumoch vynechal. Percentá pokrytia v historickom výstupe sa preto vzťahujú na zahrnuté riadky, nie na celý fond vrátane rezerv. Použité počty akciových riadkov VOO / VTI / VT boli 505 / 3 507 / 10 088 za august a 505 / 3 519 / 10 185 za september. V každom z týchto dvoch exportov VT boli navyše dva akciové riadky bez trhovej hodnoty, ktoré nevstúpili do výpočtu.
 
-## Porovnanie svetových ETF k 31. 10. 2026
+## Hlavné porovnanie svetových ETF na konci októbra 2026
 
-Otázka rozšírenia je, či kombinácia širokých svetových ETF zlepší rozloženie akciových váh oproti samotnému VT. Na tento dátum máme úplné držby VT a Vanguard FTSE All-World UCITS ETF (ISIN IE00BK5BQT80, tickery VWCE/VWRP). Export iShares MSCI ACWI ETF obsahuje úplné držby k 19. 11. 2026. Októbrové riadky na liste Historical sú časovým radom fondu, preto ACWI zatiaľ do októbrového porovnania nevstupuje.
+**Zlepší kombinácia troch svetových ETF diverzifikáciu akciových váh oproti samotnému VT?** Porovnávame samotné fondy a kombináciu VT, VWCE a ACWI po tretinách. VT a VWCE vykazujú držby k 31. 10. 2026. ACWI používa 30. 10. 2026, posledný obchodný deň mesiaca. Ide o jeden koniec mesiaca podľa dátumov vykazovania poskytovateľov. Predchádzajúca analýza VOO a VTI ostáva samostatným experimentom s americkými fondmi.
 
-| Scenár | Emitenti podľa použitého párovania | Efektívny počet pozícií | Podiel USA |
-|---|---:|---:|---:|
-| Samotné VT | 10 089 | 127,76 | 63,18 % |
-| Samotné VWCE | 3 497 | 105,65 | 62,94 % |
-| 50 % VT + 50 % VWCE | 10 205 | 115,97 | 63,06 % |
+| Scenár | Emitenti | Efektívny počet pozícií | USA | Informačné technológie | Tri najväčšie firmy |
+|---|---:|---:|---:|---:|---:|
+| VT | 10 089 | 127,76 | 63,18 % | 29,24 % | 11,97 % |
+| VWCE | 3 504 | 105,65 | 62,94 % | 30,78 % | 13,14 % |
+| ACWI | 2 184 | 102,09 | 64,64 % | 31,17 % | 13,33 % |
+| VT + VWCE + ACWI po tretinách | 10 431 | 111,19 | 63,58 % | 30,39 % | 12,81 % |
 
-Vážený prekryv VT a VWCE podľa použitého párovania je 89,64 %. Počítame z kladných trhových hodnôt akciových držieb, ktoré normalizujeme v každom fonde zvlášť. Emitent sa identifikuje podľa názvu zjednoteného pomocou Unicode NFKC, veľkosti písmen a medzier a podľa kódu krajiny uvádzaného v exporte. Rôzne názvy alebo krajiny toho istého emitenta môžu ovplyvniť počty, prekryv aj efektívny počet pozícií. Výsledok z tejto dvojice platí pre októbrový výrez a dané váhy.
+Vážený prekryv vyšiel 90,22 % pre VT/VWCE, 85,77 % pre VT/ACWI a 92,53 % pre VWCE/ACWI. Oproti samotnému VT je efektívny počet pozícií v kombinácii približne o 13 % nižší. Váhy sa o niečo viac sústredia do najväčších firiem, pričom podiel USA sa zmenil iba o 0,41 percentuálneho bodu. Porovnanie sa týka koncentrácie váh pri konkrétnych fondoch na jednom konci mesiaca.
 
-- [Držby VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf)
-- [Držby VWCE/VWRP](https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating?tab=portfolio-data)
-- [Držby ACWI](https://www.blackrock.com/us/individual/products/239600/ishares-msci-acwi-etf-acwi#holdings)
+Výpočet zahŕňa kladné trhové hodnoty z akciových držieb a normalizuje ich samostatne v každom fonde. Emitentov párujeme podľa normalizovaného názvu a krajiny. Pri odlišnom názve použijeme jedinečný normalizovaný ticker v danej krajine z exportu VT. Podľa tohto pravidla sa k VT priradilo 99,97 % váhy VWCE a 96,49 % váhy ACWI. Zvyšok môže obsahovať firmy s odlišným označením alebo klasifikáciou krajiny. Párový prekryv aj počty preto závisia od kvality párovania. Pri sektoroch používame jednotné názvy a pri spojenej firme uprednostníme klasifikáciu z VT, potom z VWCE a ACWI.
+
+Na výpočet sa použilo 10 158 z 10 160 akciových riadkov VT, 3 574 z 3 607 riadkov VWCE a 2 196 z 2 197 akciových riadkov ACWI. Dva riadky VT nemajú uvedenú trhovú hodnotu. Z VWCE a ACWI boli vynechané pozície bez kladnej hodnoty.
+
+- [Vanguard VT](https://advisors.vanguard.com/investments/products/vt/vanguard-total-world-stock-etf)
+- [Vanguard VWCE/VWRP](https://www.vanguard.co.uk/professional/product/etf/equity/9679/ftse-all-world-ucits-etf-usd-accumulating?tab=portfolio-data)
+- [BlackRock ACWI](https://www.blackrock.com/us/individual/products/239600/ishares-msci-acwi-etf-acwi)
