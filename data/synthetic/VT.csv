@@ -1,0 +1,8 @@
+position_id,asset_type,weight_pct_nav
+DEMO:ALPHA-B,equity,18
+DEMO:BETA,equity,18
+DEMO:DELTA,equity,27
+DEMO:EPSILON,equity,18
+DEMO:ZETA,equity,9
+DEMO:CASH,cash,7
+DEMO:FUTURE,derivative,1
