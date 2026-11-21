@@ -82,3 +82,17 @@ V októbrových exportoch sa hodnoty `SUB-INDUSTRY` zhodovali pri všetkých spo
 Pre širšie sektory sa v projekte používa [spoločný prevodník](data/vanguard_subindustry_sectors.csv). Pokrýva všetkých 163 pomenovaných subodvetví z októbrových exportov. Každý názov sa porovnal s nomenklatúrou GICS a priradil k jednému z 11 sektorov. Zdrojové „---“ ostáva nezaradené. Po harmonizácii má sektor informačných technológií **29,24 %** vo VT a **33,91 %** v kombinácii po tretinách. Nezaradených je približne 0,01 % akciovej zložky vo VT a 0,005 % v kombinácii.
 
 [Metodika GICS a hierarchia klasifikácie](https://www.msci.com/indexes/documents/methodology/1_MSCI_Global_Industry_Classification_Standard_GICS_Methodology_20250220.pdf)
+
+## Kontrola výsledku na troch spoločných dátumoch
+
+Rovnaký výpočet sme zopakovali na úplných akciových držbách všetkých troch fondov k 31. 8., 30. 9. a 31. 10. 2026. Kombinácia má vždy tretinové váhy VOO, VTI a VT. Všetky percentá sú normalizované na akciovú zložku.
+
+| Dátum | USA vo VT | USA v kombinácii | IT vo VT | IT v kombinácii | Efektívny počet vo VT | Efektívny počet v kombinácii |
+|---|---:|---:|---:|---:|---:|---:|
+| 31. 8. 2026 | 62,15 % | 87,38 % | 29,54 % | 34,30 % | 130,36 | 65,11 |
+| 30. 9. 2026 | 62,57 % | 87,52 % | 31,29 % | 36,11 % | 120,40 | 61,05 |
+| 31. 10. 2026 | 63,18 % | 87,73 % | 29,24 % | 33,91 % | 127,76 | 65,34 |
+
+Na všetkých troch dátumoch kombinácia zvýšila váhu amerických akcií aj informačných technológií. Efektívny počet pozícií bol v kombinácii približne polovičný oproti VT. Záver platí pre tri skontrolované konce mesiacov.
+
+V augustových a septembrových exportoch niesla akciová sekcia vybraný historický dátum, kým sekcie dlhopisov a krátkodobých rezerv ostali datované k 31. 10. 2026. Import ich pri historických dátumoch vynechal. Percentá pokrytia v historickom výstupe sa preto vzťahujú na zahrnuté riadky, nie na celý fond vrátane rezerv. Použité počty akciových riadkov VOO / VTI / VT boli 505 / 3 507 / 10 088 za august a 505 / 3 519 / 10 185 za september. V každom z týchto dvoch exportov VT boli navyše dva akciové riadky bez trhovej hodnoty, ktoré nevstúpili do výpočtu.
