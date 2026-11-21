@@ -53,3 +53,18 @@ CSV obsahuje samostatné sekcie `Equity`, `Fixed income` a `Short-term reserves`
 4. Priprav pull request z vetvy `codex/etf-overlap`. Uveď kontrolné výsledky, pokrytie dát, návod na spustenie a otvorené otázky pre analytickú revíziu.
 
 Metodiku, výsledky a spätnú väzbu odovzdávame cez commity a pull requesty, aby sa výpočet dal zopakovať z histórie projektu.
+
+## Nezávislá kontrola výsledkov k 31. 10. 2026
+
+Kontrolný výpočet z úplných CSV exportov normalizoval kladné trhové hodnoty akciovej sekcie po jednotlivých fondoch. Riadky sa spojili podľa normalizovaného názvu emitenta a kódu krajiny. Tento spôsob spája napríklad obe triedy Alphabetu. Varianty názvov medzi fondmi môžu mierne zmeniť počty emitentov aj prekryv.
+
+| Scenár | Unikátni emitenti podľa kontrolného mapovania | Efektívny počet pozícií | USA | Apple, NVIDIA a Microsoft |
+|---|---:|---:|---:|---:|
+| VOO | 503 | 43,86 | 100,00 % | 21,24 % |
+| VTI | 3 488 | 55,61 | 100,00 % | 18,76 % |
+| VT | 10 089 | 127,76 | 63,18 % | 11,97 % |
+| Tri fondy po tretinách | 12 107 | 65,34 | 87,73 % | 17,32 % |
+
+Vážený prekryv podľa emitentov dosiahol 89,31 % (VOO/VTI), 56,89 % (VOO/VT) a 62,45 % (VTI/VT). Vyšší počet unikátnych emitentov v kombinácii sprevádza nižší efektívny počet pozícií, keďže kombinácia zvyšuje váhy už dominantných spoločností. Koncentrácia podľa tejto metriky nevyjadruje volatilitu ani koreláciu portfólia.
+
+V kontrolnom výpočte bolo zahrnutých 506 akciových riadkov VOO, 3 511 VTI a 10 158 VT. Dve ďalšie pozície VT (PhosAgro GDR a Norilsk Nickel ADR) nemajú v exporte uvedenú trhovú hodnotu, preto sa nezahrnuli do výpočtu váh. Priemerných 17,32 % pre tri firmy vychádza z normalizácie akciovej zložky. Hodnota 17,21 % vyššie vychádza z verejných váh celého fondu zaokrúhlených na dve desatinné miesta.
