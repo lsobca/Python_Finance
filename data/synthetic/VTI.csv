@@ -1,0 +1,5 @@
+position_id,asset_type,weight_pct_nav
+DEMO:ALPHA-A,equity,38
+DEMO:BETA,equity,38
+DEMO:GAMMA,equity,19
+DEMO:CASH,cash,5

@@ -1,0 +1,8 @@
+position_id,issuer_id,issuer,country,sector
+DEMO:ALPHA-A,ALPHA,Alfa,US,Information Technology
+DEMO:ALPHA-B,ALPHA,Alfa,US,Information Technology
+DEMO:BETA,BETA,Beta,US,Health Care
+DEMO:GAMMA,GAMMA,Gama,US,Industrials
+DEMO:DELTA,DELTA,Delta,JP,Industrials
+DEMO:EPSILON,EPSILON,Epsilon,GB,
+DEMO:ZETA,ZETA,Zeta,,Utilities

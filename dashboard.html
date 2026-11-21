@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prekryv akcií vo VOO, VTI a VT</title>
+<style>
+  :root { font-family: system-ui, sans-serif; color: #132b2a; background: #f1f5f1; }
+  body { max-width: 70rem; margin: 0 auto; padding: 2rem 1rem; }
+  h1 { font-size: clamp(2rem, 5vw, 3rem); margin: .4rem 0; }
+  h2 { font-size: 1.3rem; }
+  p { line-height: 1.5; }
+  section, form { border: 1px solid #c6d8cf; background: white; border-radius: .7rem; padding: 1rem; margin: 1rem 0; }
+  input, select, button { font: inherit; color: inherit; padding: .35rem; }
+  input { width: 5rem; }
+  #allocations { display: flex; flex-wrap: wrap; gap: 1rem; }
+  #allocations label { display: grid; gap: .25rem; }
+  button { margin: .5rem .5rem .25rem 0; cursor: pointer; }
+  #status { color: #784020; }
+  table { border-collapse: collapse; width: 100%; text-align: left; }
+  td, th { padding: .5rem; border-bottom: 1px solid #d9e5df; }
+  td:not(:first-child), th:not(:first-child) { text-align: right; }
+  .compare { display: grid; grid-template-columns: minmax(6rem, 1fr) repeat(2, minmax(4.5rem, 1fr)); gap: .35rem .75rem; align-items: center; }
+  .compare > * { overflow-wrap: anywhere; }
+  .column { display: grid; gap: .2rem; font-variant-numeric: tabular-nums; }
+  meter { width: 100%; height: .8rem; }
+  meter::-webkit-meter-optimum-value { background: #167263; }
+  .baseline::-webkit-meter-optimum-value { background: #677d9b; }
+  meter::-moz-meter-bar { background: #167263; }
+  .baseline::-moz-meter-bar { background: #677d9b; }
+  .notice { font-weight: bold; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Prekryv akcií vo VOO, VTI a VT</h1>
+  <p class="notice" id="dataset"></p>
+</header>
+<form id="portfolio">
+  <h2>Váhy fondov</h2>
+  <p>Zadané hodnoty sa prepočítajú na podiely so súčtom 100 %.</p>
+  <div id="allocations"></div>
+  <button type="button" id="equal">Tretinové váhy</button>
+  <button type="button" id="only-vt">Len VT</button>
+  <p id="normalized" aria-live="polite"></p>
+  <p id="status" role="status"></p>
+</form>
+<section>
+  <h2>Koncentrácia</h2>
+  <table>
+    <thead><tr><th scope="col">Ukazovateľ</th><th scope="col">Portfólio</th><th scope="col">VT</th></tr></thead>
+    <tbody id="metrics"></tbody>
+  </table>
+</section>
+<section>
+  <h2>Expozície akciovej zložky</h2>
+  <label for="dimension">Zoskupiť podľa</label>
+  <select id="dimension">
+    <option value="country">Krajiny</option>
+    <option value="sector">Sektora</option>
+    <option value="issuer">Emitenta (Top 10 v každom scenári)</option>
+  </select>
+  <div id="chart" class="compare" role="table" aria-label="Expozície portfólia oproti VT"></div>
+</section>
+<section>
+  <h2>Párový vážený prekryv fondov</h2>
+  <ul id="overlap"></ul>
+  <h2>Zdroje a pokrytie</h2>
+  <ul id="sources"></ul>
+</section>
+<script type="application/json" id="report-data"><!-- REPORT_DATA --></script>
+<script>
+const report = JSON.parse(document.getElementById("report-data").textContent);
+const byId = id => document.getElementById(id);
+const pctFormat = new Intl.NumberFormat("sk", {style: "percent", maximumFractionDigits: 2});
+const countFormat = new Intl.NumberFormat("sk", {maximumFractionDigits: 2});
+const pct = value => pctFormat.format(value);
+const vt = new Map(Object.entries(report.exposures.VT));
+const funds = report.funds;
+
+function node(tag, content, attributes = {}) {
+  const element = document.createElement(tag);
+  element.textContent = content;
+  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
+  return element;
+}
+
+function ranked(weights) {
+  return Array.from(weights).sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1));
+}
+
+function sum(values) {
+  return values.reduce((total, value) => total + value, 0);
+}
+
+function distribute(weights, field) {
+  if (field === "issuer") return weights;
+  const groups = new Map();
+  for (const [id, weight] of weights) {
+    const group = report.issuers[id][field];
+    groups.set(group, (groups.get(group) || 0) + weight);
+  }
+  return groups;
+}
+
+function drawChart(weights) {
+  const field = byId("dimension").value;
+  const mixGroups = distribute(weights, field);
+  const vtGroups = distribute(vt, field);
+  const limited = groups => field === "issuer" ? ranked(groups).slice(0, 10).map(([id]) => id) : groups.keys();
+  const keys = new Set([...limited(mixGroups), ...limited(vtGroups)]);
+  const values = Array.from(keys, key => [key, mixGroups.get(key) || 0, vtGroups.get(key) || 0]);
+  values.sort((a, b) => Math.max(b[1], b[2]) - Math.max(a[1], a[2]) || a[0].localeCompare(b[0], "sk"));
+  const chart = byId("chart");
+  const header = node("div", "", {role: "row", style: "display: contents"});
+  for (const label of ["Skupina", "Portfólio", "VT"]) header.append(node("strong", label, {role: "columnheader"}));
+  chart.replaceChildren(header);
+  for (const [key, mix, baseline] of values) {
+    const label = field === "issuer" ? report.issuers[key].issuer : key;
+    const row = node("div", "", {role: "row", style: "display: contents"});
+    row.append(node("span", label, {role: "rowheader"}));
+    for (const [value, css] of [[mix, ""], [baseline, "baseline"]]) {
+      const cell = node("span", "", {role: "cell", class: "column"});
+      cell.append(node("span", pct(value)));
+      cell.append(node("meter", "", {class: css, min: 0, max: 1, value, "aria-hidden": "true"}));
+      row.append(cell);
+    }
+    chart.append(row);
+  }
+}
+
+function indicators(weights) {
+  const values = ranked(weights).map(([, weight]) => weight);
+  return [
+    ["Počet emitentov", countFormat.format(values.length)],
+    ["Efektívny počet pozícií", countFormat.format(1 / sum(values.map(value => value ** 2)))],
+    ["Podiel 3 najväčších emitentov", pct(sum(values.slice(0, 3)))],
+    ["Podiel 10 najväčších emitentov", pct(sum(values.slice(0, 10)))],
+  ];
+}
+
+const controls = funds.map(fund => {
+  const label = node("label", fund, {for: "weight-" + fund});
+  const input = node("input", "", {id: "weight-" + fund, type: "number", min: 0, max: 100, step: "any"});
+  label.append(input);
+  byId("allocations").append(label);
+  return input;
+});
+
+function update() {
+  const raw = controls.map(input => input.valueAsNumber);
+  const total = sum(raw);
+  if (!controls.every(input => input.validity.valid) || !raw.every(Number.isFinite) || total <= 0) {
+    byId("status").textContent = "Zadajte váhy od 0 do 100, aspoň jednu kladnú.";
+    byId("metrics").replaceChildren();
+    byId("chart").replaceChildren();
+    byId("normalized").textContent = "";
+    return;
+  }
+  byId("status").textContent = "";
+  const allocations = raw.map(weight => weight / total);
+  byId("normalized").textContent = funds.map((fund, index) => fund + " " + pct(allocations[index])).join(" · ");
+  const mix = new Map();
+  for (const [index, fund] of funds.entries()) {
+    if (allocations[index] === 0) continue;
+    for (const [issuer, weight] of Object.entries(report.exposures[fund])) {
+      mix.set(issuer, (mix.get(issuer) || 0) + allocations[index] * weight);
+    }
+  }
+  const baseline = indicators(vt);
+  const rows = indicators(mix).map(([label, value], index) => {
+    const row = node("tr", "");
+    row.append(node("th", label, {scope: "row"}), node("td", value), node("td", baseline[index][1]));
+    return row;
+  });
+  byId("metrics").replaceChildren(...rows);
+  drawChart(mix);
+}
+
+function setWeights(weights) {
+  controls.forEach((input, index) => { input.value = weights[index]; });
+  update();
+}
+
+byId("portfolio").addEventListener("submit", event => event.preventDefault());
+byId("allocations").addEventListener("input", update);
+byId("dimension").addEventListener("change", update);
+byId("equal").addEventListener("click", () => setWeights(funds.map(() => 100 / funds.length)));
+byId("only-vt").addEventListener("click", () => setWeights(funds.map(fund => fund === "VT" ? 100 : 0)));
+byId("dataset").textContent = (report.kind === "synthetic" ? "Syntetická vzorka" : "Dáta zo zadaných úplných držieb") + " · " + report.as_of;
+for (const [pair, share] of Object.entries(report.overlap)) {
+  byId("overlap").append(node("li", pair + " — " + pct(share)));
+}
+for (const fund of funds) {
+  const coverage = report.coverage[fund];
+  const details = fund + " — akcie " + pct(coverage.equity_nav) + " NAV, mimo akcií " +
+    pct(coverage.outside_equity_nav) + " NAV, pokrytie riadkov " + pct(coverage.rows_nav) + " NAV · ";
+  const item = node("li", details);
+  const source = report.sources[fund].source;
+  if (/^https?:\/\//i.test(source)) {
+    item.append(node("a", source, {href: source}));
+  } else {
+    item.append(document.createTextNode(source));
+  }
+  byId("sources").append(item);
+}
+setWeights(funds.map(() => 100 / funds.length));
+</script>
+</body>
+</html>
